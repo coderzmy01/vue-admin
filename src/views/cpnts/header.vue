@@ -1,22 +1,29 @@
 <script setup>
+import { useStore } from "vuex";
 let getImageUrl = (user) => {
-  return new URL(`../../assets/images/${user}.png`, import.meta.url).href
-}
+  return new URL(`../../assets/images/${user}.png`, import.meta.url).href;
+};
+const store = useStore();
+const handleCollapseClick = () => {
+  console.log("test");
+  store.commit("updateCollapse");
+};
 </script>
 <template>
   <!-- <h1>header组件封装</h1> -->
-  <div class="header-common">
+  <el-header>
     <div class="el-l">
-      <el-button size="small" plain>
+      <el-button size="small" plain @click="handleCollapseClick">
         <el-icon>
           <Menu />
         </el-icon>
       </el-button>
+      <h3>首页</h3>
     </div>
     <div class="el-r">
       <el-dropdown>
         <span class="el-dropdown-link">
-          <img :src="getImageUrl('user')" class="user">
+          <img :src="getImageUrl('user')" class="user" />
           <el-icon class="el-icon--right">
             <arrow-down />
           </el-icon>
@@ -32,13 +39,28 @@ let getImageUrl = (user) => {
         </template>
       </el-dropdown>
     </div>
-  </div>
+  </el-header>
 </template>
 <style lang="less" scoped>
-.header-common {
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #333;
+  width: 100%;
+
+  .el-l {
+    display: flex;
+    align-items: center;
+
+    .el-button {
+      margin-right: 10px;
+    }
+
+    h3 {
+      color: #fff;
+    }
+  }
 
   .el-r {
     .el-dropdown-link {
@@ -47,10 +69,8 @@ let getImageUrl = (user) => {
         height: 40px;
         border-radius: 50%;
         // vertical-align: middle;
-
       }
     }
-
   }
 }
 </style>
