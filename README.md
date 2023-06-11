@@ -1,7 +1,19 @@
-# Vue 3 + Vite
+# vue-admin
+vue通用后台管理
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 技术栈
+- vue
+- vuex
+- axios
+- element-ui
+- 二次封装axios
+- mock
+- echarts
 
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 项目模块
+- 登录页
+- 后台首页
+- 分页处理
+- 用户crud
+- 路由守卫
+- 权限管理
