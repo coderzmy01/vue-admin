@@ -1,4 +1,7 @@
 <script setup>
+import { onMounted, ref } from "vue";
+// import axios from "axios";
+import { getTableData, getCountData } from "../api/home";
 const tableData = [
   {
     name: "oppo",
@@ -37,12 +40,21 @@ const tableData = [
     totalBuy: 22000,
   },
 ];
-const tableLabel = {
-  name: "手机型号",
-  todayBuy: "今日购买",
-  monthBuy: "本月购买",
-  totalBuy: "总购买",
+const tableDataTest = ref([]);
+const countData = ref([]);
+const fetchTableData = () => {
+  getTableData().then((res) => {
+    tableDataTest.value = res.tableData;
+  });
 };
+const fetchCountData = () => {
+  getCountData().then((res) => {
+    countData.value = res.countData;
+  });
+};
+onMounted(() => {
+  fetchTableData();
+});
 </script>
 <template>
   <el-row class="home" :gutter="20">
@@ -61,7 +73,7 @@ const tableLabel = {
         </div>
       </el-card>
       <el-card shadow="hover" style="margin-top: 20px">
-        <el-table :data="tableData">
+        <el-table :data="tableDataTest" stripe>
           <el-table-column
             v-for="(val, key) in tableLabel"
             :key="key"
@@ -69,6 +81,19 @@ const tableLabel = {
             :label="val"
           ></el-table-column>
         </el-table>
+      </el-card>
+    </el-col>
+    <el-col :span="16" style="margin: top 20px">
+      <el-card
+        :body-style="{ display: 'flex', padding: 0 }"
+        v-for="item in countData"
+        :key="item.name"
+      >
+        <component
+          :is="iten.icon"
+          class="icons"
+          :style="{ background: item.color }"
+        ></component>
       </el-card>
     </el-col>
   </el-row>
