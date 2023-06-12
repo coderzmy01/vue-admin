@@ -1,4 +1,5 @@
 <script setup>
+import { useRouter } from "vue-router";
 const list = [
   {
     path: "/user",
@@ -30,9 +31,11 @@ const list = [
 ];
 const noChild = () => list.filter((item) => !item.children);
 const hasChild = () => list.filter((item) => item.children);
+const router = useRouter();
+const handleRouterClick = (item) => router.push({ path: item.path });
 </script>
 <template>
-  <el-aside :width="$store.state.isCollapse ? '80px' : '200px'">
+  <el-aside :width="$store.state.isCollapse ? '80px' : '180px'">
     <el-menu
       default-active="2"
       class="el-menu-vertical-demo"
@@ -41,10 +44,13 @@ const hasChild = () => list.filter((item) => item.children);
       :collapse="$store.state.isCollapse"
       :collapse-transition="false"
     >
+      <h3 v-show="!$store.state.isCollapse">后台管理</h3>
+      <h3 v-show="$store.state.isCollapse">后台</h3>
       <el-menu-item
         :index="item.path"
         v-for="item in noChild()"
         :key="item.path"
+        @click="handleRouterClick(item)"
       >
         <component :is="item.icon" class="icons"></component>
         <span>{{ item.label }}</span>
@@ -65,6 +71,7 @@ const hasChild = () => list.filter((item) => item.children);
             :index="iten.path"
             v-for="(iten, index) in item.children"
             :key="index"
+            @click="handleRouterClick(iten)"
           >
             <component :is="iten.icon" class="icons"></component>
             <span>{{ iten.label }}</span>
@@ -82,5 +89,11 @@ const hasChild = () => list.filter((item) => item.children);
 
 .el-menu {
   border-right: 0;
+}
+h3 {
+  line-height: 45px;
+  text-align: center;
+  font-weight: 700;
+  color: #fff;
 }
 </style>
