@@ -14,3 +14,10 @@ export function getCountData() {
     mock: true,
   });
 }
+export function getEchartsData() {
+  return request({
+    url: "/home/getEchartsData",
+    method: "get",
+    mock: true,
+  });
+}

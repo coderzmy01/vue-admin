@@ -9,6 +9,7 @@ instance.interceptors.request.use((req) => {
 instance.interceptors.response.use((req) => {
   const { code, data, msg } = req.data;
   if (code === 200) {
+    // console.log(data);
     return data;
   } else {
     console.log(req);
@@ -27,7 +28,7 @@ function request({ method, mock, params, data, ...args }) {
   }
   if (config.env === "prod") instance.defaults.baseURL = config.baseApi;
   else instance.defaults.baseURL = isMock ? config.mockApi : config.baseApi;
-  
+
   return instance({ method, mock, params, data, ...args });
 }
 export default request;

@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 const list = [
   {
     path: "/user",
@@ -29,10 +30,14 @@ const list = [
     ],
   },
 ];
+const router = useRouter();
+const store = useStore();
 const noChild = () => list.filter((item) => !item.children);
 const hasChild = () => list.filter((item) => item.children);
-const router = useRouter();
-const handleRouterClick = (item) => router.push({ path: item.path });
+const handleRouterClick = (item) => {
+  store.commit("selectMenu", item);
+  router.push({ path: item.path });
+};
 </script>
 <template>
   <el-aside :width="$store.state.isCollapse ? '80px' : '180px'">

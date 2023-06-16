@@ -1,11 +1,14 @@
 <script setup>
+import { computed } from "vue";
 import { useStore } from "vuex";
 let getImageUrl = (user) => {
   return new URL(`../../assets/images/${user}.png`, import.meta.url).href;
 };
 const store = useStore();
+const curBreadItem = computed(() => {
+  return store.state.currentBread;
+});
 const handleCollapseClick = () => {
-  console.log("test");
   store.commit("updateCollapse");
 };
 </script>
@@ -18,7 +21,12 @@ const handleCollapseClick = () => {
           <Menu />
         </el-icon>
       </el-button>
-      <h3>首页</h3>
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="curBreadItem.path" v-if="curBreadItem">{{
+          curBreadItem.label
+        }}</el-breadcrumb-item>
+      </el-breadcrumb>
     </div>
     <div class="el-r">
       <el-dropdown>
@@ -30,11 +38,8 @@ const handleCollapseClick = () => {
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>Action 1</el-dropdown-item>
-            <el-dropdown-item>Action 2</el-dropdown-item>
-            <el-dropdown-item>Action 3</el-dropdown-item>
-            <el-dropdown-item disabled>Action 4</el-dropdown-item>
-            <el-dropdown-item divided>Action 5</el-dropdown-item>
+            <el-dropdown-item>登出</el-dropdown-item>
+            <el-dropdown-item>登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -57,8 +62,11 @@ header {
       margin-right: 10px;
     }
 
-    h3 {
-      color: #fff;
+    .el-breadcrumb {
+      :deep(span) {
+        color: #fff !important;
+        cursor: pointer !important;
+      }
     }
   }
 
@@ -69,6 +77,9 @@ header {
         height: 40px;
         border-radius: 50%;
         // vertical-align: middle;
+      }
+      .el-icon--right {
+        color: #fff !important;
       }
     }
   }
