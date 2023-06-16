@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref, reactive, getCurrentInstance } from "vue";
+import { onMounted, ref, reactive, getCurrentInstance, computed } from "vue";
 import { getUserInfo, createUserInfo } from "../api/user";
-
+import dayjs from "dayjs";
 const { proxy } = getCurrentInstance();
 const userList = ref([]);
 const tableLabel = reactive([
@@ -44,9 +44,14 @@ const formUser = reactive({
   birth: "",
   addr: "",
 });
+const action = ref("add");
+const title = computed(() => {
+  return action.value === "add" ? "新增" : "编辑";
+});
 const handleClose = (done) => {
   ElMessageBox.confirm("Are you sure to close this dialog?")
     .then(() => {
+      proxy.$refs.userForm.resetFields();
       done();
     })
     .catch(() => {
@@ -59,6 +64,7 @@ const fetchUserInfo = async (config) => {
   config.total = res.count;
   userList.value = res.list.map((item) => {
     item.sexLabel = item.sex ? "男" : "女";
+    item.birth = dayjs(item.birth).format("YYYY-MM-DD");
     return item;
   });
   // console.log(userList.value);
@@ -72,19 +78,23 @@ const handleSearch = () => {
   config.name = formInline.keyword;
   fetchUserInfo(config);
 };
-const onSubmit = async () => {
-  const res = await createUserInfo(formUser);
-  if (res) {
-    dialogVisible.value = false;
-    proxy.$refs.userForm.resetFields();
-    fetchUserInfo(config);
-  }
+const onSubmit = () => {
+  proxy.$refs.userForm.validate(async (valid) => {
+    if (valid) {
+      const res = await createUserInfo(formUser);
+      if (res) {
+        dialogVisible.value = false;
+        proxy.$refs.userForm.resetFields();
+        fetchUserInfo(config);
+      }
+    }
+  });
 };
 const handleCancel = () => {
   dialogVisible.value = false;
   proxy.$refs.userForm.resetFields();
 };
-
+const handleAdd = () => {};
 onMounted(() => {
   fetchUserInfo(config);
 });
@@ -92,7 +102,7 @@ onMounted(() => {
 <template>
   <!-- <h1>user for test</h1> -->
   <div class="search">
-    <el-button type="primary" @click="dialogVisible = true">新增表单</el-button>
+    <el-button type="primary" @click="handleAdd">新增表单</el-button>
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item label="请输入">
         <el-input v-model="formInline.keyword" placeholder="输入查询关键字" />
@@ -112,7 +122,9 @@ onMounted(() => {
         :width="item.width ? item.width : 125"
       /><el-table-column fixed="right" label="操作" min-width="180">
         <template #default>
-          <el-button type="primary" size="small">编辑</el-button>
+          <el-button type="primary" size="small" @click="handleEdit"
+            >编辑</el-button
+          >
           <el-button type="danger" size="small">删除</el-button>
         </template>
       </el-table-column>
@@ -128,7 +140,7 @@ onMounted(() => {
 
   <el-dialog
     v-model="dialogVisible"
-    title="Tips"
+    :title="`${title}表单`"
     width="40%"
     :before-close="handleClose"
   >
