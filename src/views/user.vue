@@ -1,6 +1,11 @@
 <script setup>
 import { onMounted, ref, reactive, getCurrentInstance, computed } from "vue";
-import { getUserInfo, createUserInfo } from "../api/user";
+import {
+  getUserInfo,
+  createUserInfo,
+  updateUserInfo,
+  DeleteUserInfo,
+} from "../api/user";
 import dayjs from "dayjs";
 const { proxy } = getCurrentInstance();
 const userList = ref([]);
@@ -63,7 +68,7 @@ const fetchUserInfo = async (config) => {
   console.log(res);
   config.total = res.count;
   userList.value = res.list.map((item) => {
-    item.sexLabel = item.sex ? "男" : "女";
+    item.sexLabel = item.sex === 1 ? "男" : "女";
     item.birth = dayjs(item.birth).format("YYYY-MM-DD");
     return item;
   });
@@ -81,12 +86,29 @@ const handleSearch = () => {
 const onSubmit = () => {
   proxy.$refs.userForm.validate(async (valid) => {
     if (valid) {
-      const res = await createUserInfo(formUser);
-      if (res) {
-        dialogVisible.value = false;
-        proxy.$refs.userForm.resetFields();
-        fetchUserInfo(config);
+      if (action.value === "add") {
+        const res = await createUserInfo(formUser);
+        if (res) {
+          dialogVisible.value = false;
+          proxy.$refs.userForm.resetFields();
+          fetchUserInfo(config);
+        }
+      } else {
+        formUser.sex == "男" ? (formUser.sex = 1) : (formUser.sex = 0);
+        const res = await updateUserInfo(formUser);
+        if (res) {
+          console.log(formUser);
+          dialogVisible.value = false;
+          proxy.$refs.userForm.resetFields();
+          fetchUserInfo(config);
+        }
       }
+    } else {
+      ElMessage({
+        showClose: true,
+        message: "请输入正确的内容",
+        type: "error",
+      });
     }
   });
 };
@@ -94,7 +116,43 @@ const handleCancel = () => {
   dialogVisible.value = false;
   proxy.$refs.userForm.resetFields();
 };
-const handleAdd = () => {};
+const handleAdd = () => {
+  action.value = "add";
+  dialogVisible.value = true;
+};
+const handleEdit = (item) => {
+  action.value = "edit";
+  dialogVisible.value = true;
+  // console.log(item);
+  item.sex = item.sexLabel;
+  // Object.assign(formUser, item);
+  proxy.$nextTick(() => {
+    Object.assign(formUser, item);
+    console.log(formUser);
+  });
+};
+const handleDelete = (item) => {
+  ElMessageBox.confirm("这将会永久删除该条目，确定吗？", "Warning", {
+    confirmButtonText: "OK",
+    cancelButtonText: "Cancel",
+    type: "warning",
+  })
+    .then(async () => {
+      const res = await DeleteUserInfo(item);
+      // console.log(res);
+      fetchUserInfo(config);
+      ElMessage({
+        type: "success",
+        message: "Delete completed",
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        type: "info",
+        message: "Delete canceled",
+      });
+    });
+};
 onMounted(() => {
   fetchUserInfo(config);
 });
@@ -121,11 +179,13 @@ onMounted(() => {
         :key="item.prop"
         :width="item.width ? item.width : 125"
       /><el-table-column fixed="right" label="操作" min-width="180">
-        <template #default>
-          <el-button type="primary" size="small" @click="handleEdit"
+        <template #default="scope">
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)"
             >编辑</el-button
           >
-          <el-button type="danger" size="small">删除</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -176,8 +236,8 @@ onMounted(() => {
             :rules="[{ required: true, message: '性别是必选项' }]"
           >
             <el-select v-model="formUser.sex" placeholder="请选择">
-              <el-option label="男" value="0" />
-              <el-option label="女" value="1" />
+              <el-option label="男" value="1" />
+              <el-option label="女" value="0" />
             </el-select>
           </el-form-item>
         </el-col>

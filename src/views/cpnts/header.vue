@@ -1,15 +1,22 @@
 <script setup>
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 let getImageUrl = (user) => {
   return new URL(`../../assets/images/${user}.png`, import.meta.url).href;
 };
+const router = useRouter();
 const store = useStore();
 const curBreadItem = computed(() => {
   return store.state.currentBread;
 });
 const handleCollapseClick = () => {
   store.commit("updateCollapse");
+};
+const handelLogout = () => {
+  store.commit("clearMenu");
+  store.commit("clearToken");
+  router.push({ name: "login" });
 };
 </script>
 <template>
@@ -38,7 +45,7 @@ const handleCollapseClick = () => {
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>登出</el-dropdown-item>
+            <el-dropdown-item @click="handelLogout">登出</el-dropdown-item>
             <el-dropdown-item>登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>

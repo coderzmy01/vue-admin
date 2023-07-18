@@ -100,7 +100,9 @@ export default {
       List = List.filter((u) => u.id !== id);
       return {
         code: 200,
-        message: "删除成功",
+        data: {
+          message: "删除成功",
+        },
       };
     }
   },

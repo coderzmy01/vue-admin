@@ -32,8 +32,9 @@ const list = [
 ];
 const router = useRouter();
 const store = useStore();
-const noChild = () => list.filter((item) => !item.children);
-const hasChild = () => list.filter((item) => item.children);
+const noChild = () => asyncList.filter((item) => !item.children);
+const hasChild = () => asyncList.filter((item) => item.children);
+const asyncList = store.state.menu;
 const handleRouterClick = (item) => {
   store.commit("selectMenu", item);
   router.push({ path: item.path });

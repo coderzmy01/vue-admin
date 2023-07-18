@@ -1,8 +1,10 @@
 import Mock from "mockjs";
 import home from "./data/home";
 import user from "./data/user";
-
+import permission from "./data/permission";
 Mock.mock("/home/getData", home.getTableData);
 Mock.mock(/user\/getData/, "get", user.getUserList);
 Mock.mock(/user\/postUser/, "post", user.createUser);
-Mock.mock(/user\/postUser/, "post", user.createUser);
+Mock.mock(/user\/updateUser/, "post", user.updateUser);
+Mock.mock(/user\/deleteUserInfo/, "get", user.deleteUser);
+Mock.mock(/permission\/userLogin/, "post", permission.getMenu);
